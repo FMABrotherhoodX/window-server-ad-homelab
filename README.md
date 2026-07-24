@@ -13,7 +13,7 @@ management across geographic and departmental structures.
 
 ---
 
-## Episode 1: Active Directory Setup & Organizational Structure
+## Active Directory Setup & Organizational Structure
 
 Set up a domain controller from scratch on Windows Server 2022 and built 
 an organizational unit structure that mirrors how real enterprise environments 
