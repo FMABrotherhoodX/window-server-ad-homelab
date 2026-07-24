@@ -66,6 +66,6 @@ was key to setting up the right group type for each purpose.
 ---
 
 ## Upcoming
-- Episode 2: Group Policy Management
-- Episode 3: GPO Testing and Computer Domain Join
-- Episode 4: File Services and Network Sharing
+- Group Policy Management
+- GPO Testing and Computer Domain Join
+- File Services and Network Sharing
