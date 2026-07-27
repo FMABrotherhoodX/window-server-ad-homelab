@@ -27,7 +27,7 @@ Geographic OUs (USA, Europe, Asia) each contain three sub-OUs —
 Computer, Server, and User — to separate different object types by department.
 
 ### Screenshot 2 — User OU: Groups and User Accounts
-![User OU](screenshots/ad-setup/02-user-ou-groups-users.png)
+![User OU](screenshots/ad-setup/02-user-ou-groups.png)
 
 Inside the USA User OU, showing the IT-Users security group, DL-ITAdmins 
 distribution group, and three user accounts. Security groups are used for 
@@ -65,7 +65,55 @@ was key to setting up the right group type for each purpose.
 
 ---
 
+## Group Policy Management
+
+Created and configured six Group Policy Objects (GPOs) in the Group Policy Management Console (GPMC) to enforce security settings and manage user environments across the domain.
+
+### Screenshot 1 — GPMC Overview
+![GPMC Overview](screenshots/group-policy/06-gpmc-all-gpos-overview.png)
+
+All six GPOs listed under the MH.Local domain in the Group Policy Management Console, including the bonus Account Lockout policy.
+
+### Screenshot 2 — Password Policy Settings
+![Password Policy](screenshots/group-policy/07-gpo-password-policy-settings.png)
+
+Password policy configured with a 12-character minimum length, complexity requirements enabled, a 90-day maximum password age, and a 30-day minimum age. Applied under Computer Configuration since the computer enforces login requirements.
+
+### Screenshot 3 — Drive Mapping Configuration
+![Drive Mapping](screenshots/group-policy/08-gpo-drive-mapping-config.png)
+
+Network drive mapped to E: pointing to \\servername\folder. Configured under User Configuration Preferences since users can modify mapped drives if needed.
+
+### Screenshot 4 — Desktop Wallpaper Policy
+![Desktop Wallpaper](screenshots/group-policy/09-gpo-desktop-wallpaper-settings.png)
+
+Desktop wallpaper policy enabled under User Configuration Policies to enforce a consistent wallpaper across all users. Set as a Policy rather than a Preference so users cannot change it.
+
+### Screenshot 5 — Restrict Control Panel
+![Restrict Control Panel](screenshots/group-policy/10-gpo-restrict-control-panel.png)
+
+Control panel access fully prohibited for all users. Configured under User Configuration Policies with Prohibit access to Control Panel and PC settings set to Enabled.
+
+### Screenshot 6 — Disable USB Storage
+![Disable USB Storage](screenshots/group-policy/11-gpo-disable-usb-storage.png)
+
+All removable storage classes are denied access at the computer level. Configured under Computer Configuration Policies to prevent users from using any USB storage devices.
+
+### Screenshot 7 — Account Lockout Policy (Bonus)
+![Account Lockout](screenshots/group-policy/12-gpo-account-lockout-policy.png)
+
+Account lockout configured with a threshold of 5 invalid logon attempts, a 30-minute lockout duration, and a 30-minute reset counter. This prevents brute force attacks on user accounts.
+
+### What I Learned
+Group Policy has two configuration types — Computer Configuration applies
+settings to the machine regardless of who logs in, while User Configuration
+applies settings to the user wherever they log in. Policies are enforced
+and cannot be changed by users, while Preferences set defaults that users
+can modify. Choosing the right combination of configuration type and setting
+type is the key decision when creating any GPO in a real enterprise environment.
+
+---
+
 ## Upcoming
-- Group Policy Management
 - GPO Testing and Computer Domain Join
 - File Services and Network Sharing
