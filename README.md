@@ -10,7 +10,7 @@ management across geographic and departmental structures.
 - VMware Workstation Pro
 - Windows Server 2022 Evaluation
 - Active Directory Domain Services (AD DS)
-
+- Windows 11 Enterprise
 ---
 
 ## Active Directory Setup & Organizational Structure
@@ -114,6 +114,49 @@ type is the key decision when creating any GPO in a real enterprise environment.
 
 ---
 
+## GPO Testing & Computer Domain Join
+
+Created a Windows 11 Enterprise VM, joined it to the MH.Local domain, applied Group Policy Objects to the client machine, and verified they were working. Ran into a real-world troubleshooting scenario when domain admin credentials were rejected — resolved it by promoting a domain user to Domain Admin through ADUC.
+
+### Screenshot 1 — Server Static IP Configuration
+![Server Static IP](screenshots/gpo-testing-domain-join/13-server-static-ip-configured.png)
+
+Server configured with a static IP address. DNS set to the loopback address 127.0.0.1 pointing to itself as the domain controller, with Google DNS 8.8.8.8 as the secondary. Static IP is best practice for servers so the address does not change on reboot.
+
+### Screenshot 2 — Client DNS Pointing to Server
+![Client DNS](screenshots/gpo-testing-domain-join/14-client-dns-pointing-to-server.png)
+
+Windows 11 Enterprise client configured to use the server's static IP as its primary DNS server. This allows the client to communicate with the domain controller and is required before joining the domain.
+
+### Screenshot 3 — Client Joined to Domain
+![Domain Join](screenshots/gpo-testing-domain-join/15-client-joined-to-domain.png)
+
+System Properties on the Windows 11 client showing Comp01 successfully joined to the MH.Local domain. Full computer name reads Comp01.MH.Local confirming the domain join.
+
+### Screenshot 4 — Computer Moved to Correct OU
+![Computer in OU](screenshots/gpo-testing-domain-join/16-aduc-computer-moved-to-ou.png)
+
+After joining the domain the computer automatically landed in the default Computers container. Moved it manually to USA > Computer OU in ADUC so the correct GPOs would apply to it. Best practice is to always move newly joined computers to their appropriate OU.
+
+### Screenshot 5 — GPOs Linked to OUs
+![GPOs Linked](screenshots/gpo-testing-domain-join/17-gpmc-gpos-linked-to-ous.png)
+
+GPMC showing Restrict Control Panel linked to MH.Local/USA/User with Link Enabled confirmed. Computer OU has Disable USB Devices and Password Policy linked. User OU has Desktop Wallpaper, Drive Mapping, and Restrict Control Panel linked.
+
+### Screenshot 6 — gpupdate /force
+![gpupdate force](screenshots/gpo-testing-domain-join/18-gpupdate-force-complete.png)
+
+Ran gpupdate /force on the client to apply GPO settings immediately instead of waiting the default 90 minute refresh cycle. Both Computer Policy and User Policy updated successfully.
+
+### Screenshot 7 — GPO Blocking Control Panel
+![Control Panel Blocked](screenshots/gpo-testing-domain-join/19-gpo-control-panel-blocked.png)
+
+Attempted to open Control Panel on the client after forcing the GPO update. Restrictions error message confirms the policy applied successfully — access cancelled and user directed to contact system administrator.
+
+### What I Learned
+When a computer joins a domain it lands in the default Computers container, not the custom OUs. Moving it to the correct OU is a required step before GPOs will apply to it. GPOs do not apply instantly — they refresh every 90 minutes by default. In a real environment gpupdate /force is used to push policy changes immediately. Running into credential issues with the built-in Administrator account was also a useful real-world scenario — promoting a domain user to Domain Admin through ADUC is the practical fix when the built-in account password is unknown.
+
+---
+
 ## Upcoming
-- GPO Testing and Computer Domain Join
 - File Services and Network Sharing
