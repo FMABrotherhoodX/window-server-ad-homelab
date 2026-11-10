@@ -11,6 +11,9 @@ management across geographic and departmental structures.
 - Windows Server 2022 Evaluation
 - Active Directory Domain Services (AD DS)
 - Windows 11 Enterprise
+- Group Policy Management Console
+- File Server Resource Manager
+  
 ---
 
 ## Active Directory Setup & Organizational Structure
@@ -116,7 +119,7 @@ type is the key decision when creating any GPO in a real enterprise environment.
 
 ## GPO Testing & Computer Domain Join
 
-Created a Windows 11 Enterprise VM, joined it to the MH.Local domain, applied Group Policy Objects to the client machine, and verified they were working. Ran into a real-world troubleshooting scenario when domain admin credentials were rejected — resolved it by promoting a domain user to Domain Admin through ADUC.
+Created a Windows 11 Enterprise VM, joined it to the MH.Local domain, applied Group Policy Objects to the client machine, and verified they were working. Ran into rejected admin credentials on the client. For the lab, I gave a test user Domain Admin rights to continue; in a production environment, the better fix is to reset the built-in Administrator password and keep Domain Admin membership to a minimum.
 
 ### Screenshot 1 — Server Static IP Configuration
 ![Server Static IP](screenshots/gpo-testing-domain-join/13-server-static-ip-configured.png)
@@ -154,7 +157,7 @@ Ran gpupdate /force on the client to apply GPO settings immediately instead of w
 Attempted to open Control Panel on the client after forcing the GPO update. Restrictions error message confirms the policy applied successfully — access cancelled and user directed to contact system administrator.
 
 ### What I Learned
-When a computer joins a domain, it lands in the default Computers container, not the custom OUs. Moving it to the correct OU is a required step before GPOs will apply to it. GPOs do not apply instantly — they refresh every 90 minutes by default. In a real environment, gpupdate /force is used to push policy changes immediately. Running into credential issues with the built-in Administrator account was also a useful real-world scenario — promoting a domain user to Domain Admin through ADUC is the practical fix when the built-in account password is unknown.
+When a computer joins a domain, it lands in the default Computers container, not the custom OUs. Moving it to the correct OU is a required step before GPOs will apply to it. GPOs do not apply instantly — they refresh every 90 minutes by default. In a real environment, gpupdate /force is used to push policy changes immediately. Running into credential issues with the built-in Administrator account was a useful real-world scenario. I gave a test user Domain Admin rights to continue in the lab, but in production the better fix is to reset the Administrator password and limit Domain Admin membership to the fewest accounts needed.
 
 ---
 
@@ -180,7 +183,7 @@ Drive Maps preference under User Configuration, mapping S: to the SHARED folder 
 ### Screenshot 4 — Mapped Drive on the Client
 ![Mapped Drive](screenshots/file-services/23-client-mapped-drive-after-reboot.png)
 
-The Windows 11 Enterprise client showing SHARED (S:) under Network locations.
+The Windows 11 Enterprise client shows SHARED (S:) under Network locations. After a reboot and sign-in as a domain user, the drive mapped automatically.
 
 ### Screenshot 5 — File Server Resource Manager
 ![FSRM Console](screenshots/file-services/24-fsrm-installed-console.png)
