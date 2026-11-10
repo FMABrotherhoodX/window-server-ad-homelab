@@ -36,14 +36,14 @@ assigning permissions, while distribution groups are used for email lists.
 ### Screenshot 3 — Computer OU: Security Group and Placeholder PCs
 ![Computer OU](screenshots/ad-setup/03-computer-ou-group-pcs.png)
 
-Inside the USA Computer OU showing the IT-Computer security group alongside 
+Inside the USA Computer OU, showing the IT-Computer security group alongside 
 placeholder computer objects PC01, PC02, and PC03 representing workstations 
 assigned to the IT department.
 
 ### Screenshot 4 — Server OU: Security Group and Placeholder Servers
 ![Server OU](screenshots/ad-setup/04-server-ou-group-servers.png)
 
-Inside the USA Server OU showing the IT-Server security group alongside 
+Inside the USA Server OU, showing the IT-Server security group alongside 
 placeholder server objects SRV01, SRV02, and SRV03 representing servers 
 assigned to the IT department.
 
@@ -92,7 +92,7 @@ Desktop wallpaper policy enabled under User Configuration Policies to enforce a 
 ### Screenshot 5 — Restrict Control Panel
 ![Restrict Control Panel](screenshots/group-policy/10-gpo-restrict-control-panel.png)
 
-Control panel access fully prohibited for all users. Configured under User Configuration Policies with Prohibit access to Control Panel and PC settings set to Enabled.
+Control Panel access is fully prohibited for all users. Configured under User Configuration Policies with Prohibit access to Control Panel and PC settings set to Enabled.
 
 ### Screenshot 6 — Disable USB Storage
 ![Disable USB Storage](screenshots/group-policy/11-gpo-disable-usb-storage.png)
@@ -102,7 +102,7 @@ All removable storage classes are denied access at the computer level. Configure
 ### Screenshot 7 — Account Lockout Policy (Bonus)
 ![Account Lockout](screenshots/group-policy/12-gpo-account-lockout-policy.png)
 
-Account lockout configured with a threshold of 5 invalid logon attempts, a 30-minute lockout duration, and a 30-minute reset counter. This prevents brute force attacks on user accounts.
+Account lockout is configured with a threshold of 5 invalid logon attempts, a 30-minute lockout duration, and a 30-minute reset counter. This prevents brute-force attacks on user accounts.
 
 ### What I Learned
 Group Policy has two configuration types — Computer Configuration applies
@@ -121,7 +121,7 @@ Created a Windows 11 Enterprise VM, joined it to the MH.Local domain, applied Gr
 ### Screenshot 1 — Server Static IP Configuration
 ![Server Static IP](screenshots/gpo-testing-domain-join/13-server-static-ip-configured.png)
 
-Server configured with a static IP address. DNS set to the loopback address 127.0.0.1 pointing to itself as the domain controller, with Google DNS 8.8.8.8 as the secondary. Static IP is best practice for servers so the address does not change on reboot.
+Server configured with a static IP address. DNS is set to the loopback address 127.0.0.1 pointing to itself as the domain controller, with Google DNS 8.8.8.8 as the secondary. Static IP is best practice for servers so the address does not change on reboot.
 
 ### Screenshot 2 — Client DNS Pointing to Server
 ![Client DNS](screenshots/gpo-testing-domain-join/14-client-dns-pointing-to-server.png)
@@ -136,7 +136,7 @@ System Properties on the Windows 11 client showing Comp01 successfully joined to
 ### Screenshot 4 — Computer Moved to Correct OU
 ![Computer in OU](screenshots/gpo-testing-domain-join/16-aduc-computer-moved-to-ou.png)
 
-After joining the domain the computer automatically landed in the default Computers container. Moved it manually to USA > Computer OU in ADUC so the correct GPOs would apply to it. Best practice is to always move newly joined computers to their appropriate OU.
+After joining the domain, the computer automatically landed in the default Computers container. Moved it manually to USA > Computer OU in ADUC so the correct GPOs would apply to it. Best practice is to always move newly joined computers to their appropriate OU.
 
 ### Screenshot 5 — GPOs Linked to OUs
 ![GPOs Linked](screenshots/gpo-testing-domain-join/17-gpmc-gpos-linked-to-ous.png)
@@ -146,7 +146,7 @@ GPMC showing Restrict Control Panel linked to MH.Local/USA/User with Link Enable
 ### Screenshot 6 — gpupdate /force
 ![gpupdate force](screenshots/gpo-testing-domain-join/18-gpupdate-force-complete.png)
 
-Ran gpupdate /force on the client to apply GPO settings immediately instead of waiting the default 90 minute refresh cycle. Both Computer Policy and User Policy updated successfully.
+Ran gpupdate /force on the client to apply GPO settings immediately instead of waiting for the default 90-minute refresh cycle. Both Computer Policy and User Policy updated successfully.
 
 ### Screenshot 7 — GPO Blocking Control Panel
 ![Control Panel Blocked](screenshots/gpo-testing-domain-join/19-gpo-control-panel-blocked.png)
@@ -154,9 +154,45 @@ Ran gpupdate /force on the client to apply GPO settings immediately instead of w
 Attempted to open Control Panel on the client after forcing the GPO update. Restrictions error message confirms the policy applied successfully — access cancelled and user directed to contact system administrator.
 
 ### What I Learned
-When a computer joins a domain it lands in the default Computers container, not the custom OUs. Moving it to the correct OU is a required step before GPOs will apply to it. GPOs do not apply instantly — they refresh every 90 minutes by default. In a real environment gpupdate /force is used to push policy changes immediately. Running into credential issues with the built-in Administrator account was also a useful real-world scenario — promoting a domain user to Domain Admin through ADUC is the practical fix when the built-in account password is unknown.
+When a computer joins a domain, it lands in the default Computers container, not the custom OUs. Moving it to the correct OU is a required step before GPOs will apply to it. GPOs do not apply instantly — they refresh every 90 minutes by default. In a real environment, gpupdate /force is used to push policy changes immediately. Running into credential issues with the built-in Administrator account was also a useful real-world scenario — promoting a domain user to Domain Admin through ADUC is the practical fix when the built-in account password is unknown.
 
 ---
 
-## Upcoming
-- File Services and Network Sharing
+## File Services & Network Sharing
+
+Created a shared folder on the domain controller, set share and NTFS permissions, mapped it to the Windows 11 client through Group Policy, and used File Server Resource Manager to limit storage and block file types.
+
+### Screenshot 1 — Share Permissions
+![Share Permissions](screenshots/file-services/20-shared-folder-share-permissions.png)
+
+Share permissions on the SHARED folder. Domain Users have Read access. Share permissions apply at the folder level over the network.
+
+### Screenshot 2 — NTFS Permissions
+![NTFS Permissions](screenshots/file-services/21-shared-folder-ntfs-permissions.png)
+
+Security tab on the SHARED folder. The Users group has Read & execute, List folder contents, and Read, inherited from the drive root. NTFS permissions are more detailed than share permissions and apply to the subfolders and files inside.
+
+### Screenshot 3 — Drive Map Group Policy
+![Drive Map GPO](screenshots/file-services/22-gpo-drive-map-configuration.png)
+
+Drive Maps preference under User Configuration, mapping S: to the SHARED folder on the server. It is a preference, so users can still change their own drive settings.
+
+### Screenshot 4 — Mapped Drive on the Client
+![Mapped Drive](screenshots/file-services/23-client-mapped-drive-after-reboot.png)
+
+The Windows 11 Enterprise client showing SHARED (S:) under Network locations.
+
+### Screenshot 5 — File Server Resource Manager
+![FSRM Console](screenshots/file-services/24-fsrm-installed-console.png)
+
+File Server Resource Manager is installed on the server, with Quota Management and File Screening Management available.
+
+### Screenshot 6 — Quota
+![Quota](screenshots/file-services/25-fsrm-quota-on-shared-folder.png)
+
+Hard quota of 100 MB on C:\SHARED, so users cannot exceed the limit, with a warning threshold at 80%.
+
+### Screenshot 7 — File Screen
+![File Screen](screenshots/file-services/26-fsrm-file-screen-on-shared-folder.png)
+
+Active file screen on C:\SHARED blocking audio and video, compressed, executable, image, and web page files.
